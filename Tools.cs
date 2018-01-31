@@ -22,3 +22,129 @@ pComentario.Set(comentario);
 pMarca.Set(marca);
 
 t.Commit();
+
+// Filtros y Colecciones
+// Encontrar todos los ejemplares de Muros del Documento
+ElementCategoryFilter filter = new ElementCategoryFilter(BuiltInCategory.OST_Walls);
+FilteredElementCollector collector = new FilteredElementCollector(document);
+List<Element> lista = collector.WherePasses(filter).WhereElementIsNotElementType().ToList();
+// Otras variantes
+// Obtener todas las Topografías
+FilteredElementCollector collector = new FilteredElementCollector(doc);
+List<Element> lstTopo = collector.OfClass(typeof(TopographySurface)).ToList();
+
+// LinQ: se necesita igualmente un Collector
+FilteredElementCollector collector = new FilteredElementCollector(doc);
+List<Element> elements = collector.WhereElementIsNotElementType().ToList();
+List<Element> lstInstance = (from elem in elements
+                                         where elem.Category != null
+                                         && elem.Category.Id != (new ElementId(BuiltInCategory.OST_Cameras))
+                                         && elem.Category.Id != (new ElementId(BuiltInCategory.OST_StackedWalls))
+                                         select elem).ToList();
+
+// Seleccionar elemento en la Interfaz
+List<ElementId> lista = new List<ElementId>();
+lista.Add(elem.Id);
+uiDoc.Selection.SetElementIds(lista);
+
+// Obtener todos los Elementos del Modelo
+public static List<Element> GetAllElements(Document doc)
+{
+    FilteredElementCollector collector = new FilteredElementCollector(doc);
+    return collector.WhereElementIsNotElementType().ToList();
+}
+
+// Crear una lista de Niveles del Proyecto
+public static List<Level> ObtenerListaNiveles(Document doc)
+{
+    // Crear una lista vacia de niveles
+    List<Level> niveles = new List<Level>();
+
+    // Crear un collector de Niveles
+    FilteredElementCollector collector = new FilteredElementCollector(doc);
+    List<Element> elementos = collector.OfClass(typeof(Level)).ToList();
+
+    // Llenar la lista de Niveles
+    foreach (var item in elementos)
+    {
+        // Convierto el Elemento en un Nivel
+        Level nivel = item as Level;
+
+        // Lleno la lista de niveles
+        niveles.Add(nivel);
+    }
+    return niveles;
+}
+// Obtener una Lista de FamilySymbol
+public static List<FamilySymbol> ObtenerListaTiposFamiliaModelo(Document doc)
+{
+    List<FamilySymbol> lst = new List<FamilySymbol>();
+    FilteredElementCollector collector = new FilteredElementCollector(doc);
+    List<Element> lstElem = collector.OfClass(typeof(FamilySymbol)).ToList();
+    foreach (Element elem in lstElem)
+    {
+        // Convertir el Elemento en FamilySymbol
+        FamilySymbol fm = elem as FamilySymbol;
+        // Verificar si es una Familia de Modelo
+        if (fm.Category.CategoryType == CategoryType.Model)
+        {
+            lst.Add(fm);
+        }
+    }
+    return lst;
+}
+
+// Crear una lista de Categorias del Modelo
+public static List<Category> ObtenerListaCategoriasModelo(Document doc)
+{
+    // Crear una lista vacia
+    List<Category> categorias = new List<Category>();
+
+    // Obtener una lista de tipos de familia cargados
+    List<FamilySymbol> tipos = ObtenerListaTiposFamiliaModelo(doc);
+
+    // Rellenar la Lista de Category
+    foreach (var item in tipos)
+    {
+        // Verificar que la Categoria NO exista en la Lista
+        if (!categorias.Exists(x => x.Name == item.Category.Name))
+        {
+            categorias.Add(item.Category);
+        }
+    }
+    return categorias;
+}
+
+// Obtener una Familia a partir de su nombre
+public static FamilySymbol ObtenerTipoFamiliaPorNombre(Document doc, string name)
+{
+    FamilySymbol family = null;
+    foreach (FamilySymbol sym in GetAllFamilySymbol(doc))
+    {
+        if (sym.Name == name)
+        {
+            family = sym;
+        }
+    }
+    return family;
+}
+
+// Obtener un Nivel a partir de su nombre
+public static Level ObtenerNivelPorNombre(Document doc, string name)
+{
+    Level lvl = null;
+    foreach (Level level in GetAllLevels(doc))
+    {
+        if (level.Name == name)
+        {
+            lvl = level;
+        }
+    }
+    return lvl;
+}
+
+// Crear Ejemplares de Familia. Se debe crear una lista de FamilyInstanceCreationData
+// Se debe referenciar <<using Autodesk.Revit.Creation;>>
+FamilyInstanceCreationData ficreationdata = new FamilyInstanceCreationData(pointXYZ, familySymbol, 
+                        level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+_doc.Create.NewFamilyInstances2(lstData);
