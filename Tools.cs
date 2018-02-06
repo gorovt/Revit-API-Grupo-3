@@ -42,6 +42,43 @@ List<Element> lstInstance = (from elem in elements
                                          && elem.Category.Id != (new ElementId(BuiltInCategory.OST_StackedWalls))
                                          select elem).ToList();
 
+// Tools
+/// <summary> Obtener una Lista de elementos según una Categoría determinada </summary>
+public static List<Element> ObtenerElementosPorCategoria(Document doc, ElementId categoriaId)
+{
+    FilteredElementCollector colector = new FilteredElementCollector(doc);
+    List<Element> elementos = colector.WhereElementIsNotElementType().ToList();
+    List<Element> filtrados = (from elem in elementos
+                               where elem.Category != null
+                               && elem.Category.Id == categoriaId
+                               select elem).ToList();
+
+    return filtrados;
+}
+
+/// <summary> Obtiene una Lista de Categorias existentes en el Modelo </summary>
+public List<Category> ObtenerCategoriasModelo(Document doc)
+{
+    FilteredElementCollector colector = new FilteredElementCollector(doc);
+    List<Element> elementos = colector.WhereElementIsNotElementType().ToList();
+    List<Element> filtrados = (from elem in elementos
+                               where elem.Category != null
+                               && elem.Category.CategoryType == CategoryType.Model
+                               select elem).ToList();
+
+    // Lista vacias de categorias
+    List<Category> categorias = new List<Category>();
+    // Recorrer los elementos filtrados
+    foreach (Element elem in filtrados)
+    {
+        // Validar que la categoria NO exista en la lista
+        if (!categorias.Exists(x => x.Id == elem.Category.Id))
+        {
+            categorias.Add(elem.Category);
+        }
+    }
+    return categorias;
+}
 // Seleccionar elemento en la Interfaz
 List<ElementId> lista = new List<ElementId>();
 lista.Add(elem.Id);
