@@ -57,7 +57,7 @@ public static List<Element> ObtenerElementosPorCategoria(Document doc, ElementId
 }
 
 /// <summary> Obtiene una Lista de Categorias existentes en el Modelo </summary>
-public List<Category> ObtenerCategoriasModelo(Document doc)
+public static List<Category> ObtenerCategoriasModelo(Document doc)
 {
     FilteredElementCollector colector = new FilteredElementCollector(doc);
     List<Element> elementos = colector.WhereElementIsNotElementType().ToList();
