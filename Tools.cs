@@ -158,7 +158,8 @@ public static FamilySymbol ObtenerTipoFamiliaPorNombre(Document doc, string name
     FamilySymbol family = null;
     foreach (FamilySymbol sym in GetAllFamilySymbol(doc))
     {
-        if (sym.Name == name)
+        string familiaTipo = tipo.Family.Name + ":" + tipo.Name;
+        if (familiaTipo == name)
         {
             family = sym;
         }
