@@ -185,3 +185,39 @@ public static Level ObtenerNivelPorNombre(Document doc, string name)
 FamilyInstanceCreationData ficreationdata = new FamilyInstanceCreationData(pointXYZ, familySymbol, 
                         level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
 _doc.Create.NewFamilyInstances2(lstData);
+
+/// <summary> Obtiene una lista de XYZ a partir de un DataGridView de 3 columnas con coordenada </summary>
+public static List<XYZ> ObtenerListaPuntosDeDataGridView(DataGridView view)
+{
+    // Lista de puntos vacio
+    List<XYZ> puntos = new List<XYZ>();
+
+    // Recorrer las filas del DataGridView y crear puntos
+    foreach (DataGridViewRow fila in view.Rows)
+    {
+        // Estoy dentro de la fila del Datagrid
+        try
+        {
+            // Obtener los textos de cada celda
+            string coordX = fila.Cells[0].Value.ToString();
+            string coordY = fila.Cells[1].Value.ToString();
+            string coordZ = fila.Cells[2].Value.ToString();
+
+            // Convertir los textos en Doubles
+            double x = Convert.ToDouble(coordX);
+            double y = Convert.ToDouble(coordY);
+            double z = Convert.ToDouble(coordZ);
+
+            // Crear el punto
+            XYZ punto = new XYZ(x, y, z);
+            puntos.Add(punto);
+        }
+        catch (Exception)
+        {
+            // No hacer nada
+        }
+    }
+
+    // devolver la lista de puntos
+    return puntos;
+}
