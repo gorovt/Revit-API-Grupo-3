@@ -222,3 +222,10 @@ public static List<XYZ> ObtenerListaPuntosDeDataGridView(DataGridView view)
     // devolver la lista de puntos
     return puntos;
 }
+
+/// <summary> Obtener el directorio de la Addin </summary>
+public static string ObtenerDirectorioDeEstaAddin()
+{
+    string directorio = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    return directorio;
+}
