@@ -204,9 +204,9 @@ public static List<XYZ> ObtenerListaPuntosDeDataGridView(DataGridView view)
             string coordZ = fila.Cells[2].Value.ToString();
 
             // Convertir los textos en Doubles
-            double x = Convert.ToDouble(coordX);
-            double y = Convert.ToDouble(coordY);
-            double z = Convert.ToDouble(coordZ);
+            double x = Convert.ToDouble(coordX) / 0.3048; // Convertir metros a pies
+            double y = Convert.ToDouble(coordY) / 0.3048; // Convertir metros a pies
+            double z = Convert.ToDouble(coordZ) / 0.3048; // Convretir metros a pies
 
             // Crear el punto
             XYZ punto = new XYZ(x, y, z);
