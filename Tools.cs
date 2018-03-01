@@ -1,3 +1,6 @@
+#region a
+
+#endregion
 // Variables necesarias en todos los Comandos Externos
 UIApplication uiApp = commandData.Application;
 UIDocument uiDoc = uiApp.ActiveUIDocument;
