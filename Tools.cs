@@ -319,3 +319,64 @@ public static Element ObtenerElementDesdeTreeNodo(TreeNode nodo, Document doc)
     ElementId elemId = new ElementId(Convert.ToInt32(id));
     return doc.GetElement(elemId);
 }
+
+// Exportar el TreeView Habitaciones a un Excel
+public static void ExportarTreeViewExcel(TreeView tree, string rutaArchivo, Document doc)
+{
+    // Crear una DataTable para guardar los datos
+    DataTable dt = new DataTable();
+
+    // Agregar Columnas a la DataTable
+    dt.Columns.Add("Habitación N°");
+    dt.Columns.Add("Habitación Nombre");
+    dt.Columns.Add("Activo Categoria");
+    dt.Columns.Add("Activo Nombre");
+    dt.Columns.Add("Activo ID");
+
+    // Agregar Filas a la DataTable
+    foreach (TreeNode node1 in tree.Nodes[0].Nodes)
+    {
+        dt.Rows.Add();
+        foreach (TreeNode node2 in node1.Nodes)
+        {
+            dt.Rows.Add();
+        }
+    }
+
+    // Crear el Libro de Excel
+    XLWorkbook wb = new XLWorkbook();
+
+    // Crear la Hoja de Excel con la DataTable
+    wb.Worksheets.Add(dt, "Activos");
+
+    // Obtener la Hoja de Excel creada
+    var ws = wb.Worksheet(1);
+    int row = 2;
+
+    // Recorrer el TreeView y completar las celdas de la Hoja de Excel
+    foreach (TreeNode node1 in tree.Nodes[0].Nodes)
+    {
+        // Nodo de Habitación
+        Room habitacion = Tools.ObtenerRoomDesdeTreeNodo(node1, doc);
+        ws.Cell(row, 1).Value = habitacion.Number;
+        ws.Cell(row, 1).Style.Font.Bold = true;
+        ws.Cell(row, 2).Value = habitacion.Name;
+        ws.Cell(row, 2).Style.Font.Bold = true;
+        row++;
+
+        // Nodos de Activos
+        foreach (TreeNode node2 in node1.Nodes)
+        {
+            Element activo = Tools.ObtenerElementDesdeTreeNodo(node2, doc);
+            ws.Cell(row, 1).Value = habitacion.Number;
+            ws.Cell(row, 2).Value = habitacion.Name;
+            ws.Cell(row, 3).Value = activo.Category.Name;
+            ws.Cell(row, 4).Value = activo.Name;
+            ws.Cell(row, 5).Value = activo.Id.IntegerValue.ToString();
+            row++;
+        }
+    }
+
+    // Guardar el libro de excel
+    wb.SaveAs(rutaArchivo);
+}
