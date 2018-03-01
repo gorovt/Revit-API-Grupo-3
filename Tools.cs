@@ -229,3 +229,93 @@ public static string ObtenerDirectorioDeEstaAddin()
     string directorio = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     return directorio;
 }
+
+
+// TEMA FM
+// Crear una lista de Elementos para Trackear
+public static List<FamilyInstance> ObtenerFamiliasParaFm(Document doc)
+{
+    List<FamilyInstance> lstInstances = new List<FamilyInstance>();
+    FilteredElementCollector col = new FilteredElementCollector(doc);
+    var familyInstances = col.WhereElementIsNotElementType().WhereElementIsViewIndependent().OfClass(typeof(FamilyInstance));
+    List<Element> lst = (from elem in familyInstances
+                         where elem.Category.Id == new ElementId(BuiltInCategory.OST_Doors)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_Windows)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_Furniture)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_DuctTerminal)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_PlumbingFixtures)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_MechanicalEquipment)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_ElectricalEquipment)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_LightingDevices)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_LightingFixtures)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_ElectricalFixtures)
+                         || elem.Category.Id == new ElementId(BuiltInCategory.OST_Sprinklers)
+                         select elem).ToList();
+    foreach (var elem in lst)
+    {
+        FamilyInstance fam = elem as FamilyInstance;
+        lstInstances.Add(fam);
+    }
+    return lstInstances;
+}
+
+// Crear una lista de Rooms
+public static List<Room> ObtenerHabitaciones(Document doc)
+{
+    List<Room> lstRooms = new List<Room>();
+    FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(SpatialElement));
+
+    foreach (SpatialElement e in collector)
+    {
+        Room room = e as Room;
+
+        if (null != room)
+        {
+            if (null != room.Level)
+            {
+                lstRooms.Add(room);
+            }
+        }
+    }
+    return lstRooms;
+}
+
+// Exportar un TreeView a un archivo CSV
+public static void ExportarTreeViewCsv(TreeView tree, string rutaArchivo)
+{
+    // Crear un stringBuilder
+    StringBuilder sb = new StringBuilder();
+
+    // Agregar los titulos
+    sb.AppendLine("Habitacion;Familia");
+  
+    // Recorrer las ramas del TreeView
+    foreach (TreeNode nodeRoom in tree.Nodes[0].Nodes)
+    {
+        foreach (TreeNode nodeFamilia in nodeRoom.Nodes)
+        {
+            // Crear la linea de texto del archivo CSV
+            string linea = nodeRoom.Text + ";" + nodeFamilia.Text;
+            // Agregar al stringbuilder
+            sb.AppendLine(linea);
+        }
+    }
+    File.WriteAllText(rutaArchivo, sb.ToString());
+}
+
+// Obtener una Habitación de un TreeNodo
+public static Room ObtenerRoomDesdeTreeNodo(TreeNode nodo, Document doc)
+{
+    string id = nodo.Name;
+    ElementId elemId = new ElementId(Convert.ToInt32(id));
+    Element elem = doc.GetElement(elemId);
+    return elem as Room;
+}
+
+// Obtener un Elemento de un TreeNodo
+public static Element ObtenerElementDesdeTreeNodo(TreeNode nodo, Document doc)
+{
+    string id = nodo.Name;
+    ElementId elemId = new ElementId(Convert.ToInt32(id));
+    return doc.GetElement(elemId);
+}
