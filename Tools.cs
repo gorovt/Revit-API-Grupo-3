@@ -380,3 +380,63 @@ public static void ExportarTreeViewExcel(TreeView tree, string rutaArchivo, Docu
     // Guardar el libro de excel
     wb.SaveAs(rutaArchivo);
 }
+
+// Importar Puntos desde CSV
+public static List<XYZ> ImportarPuntosCSV(string rutaArchivo)
+{
+    // Crear Lista de Puntos vacia
+    List<XYZ> listaPuntos = new List<XYZ>();
+
+    // Leer líneas del archivo CSV
+    string[] lines = File.ReadAllLines(rutaArchivo);
+
+    // Quitar la primera línea de titulos
+    string[] lines2 = lines.Skip(1).ToArray();
+
+    for (int i = 0; i < lines2.Length; i++)
+    {
+        string[] values = Regex.Split(lines2[i], ";");
+        try
+        {
+            double x = Convert.ToDouble(values[0]);
+            double y = Convert.ToDouble(values[1]);
+            XYZ punto = new XYZ(x, y, 0);
+            listaPuntos.Add(punto);
+        }
+        catch (Exception)
+        {
+            // No hacer nada
+        }
+    }
+
+    return listaPuntos;
+}
+
+// Importar Puntos desde Excel
+public static List<XYZ> ImportarPuntosExcel(string rutaArchivo)
+{
+    // Crear Lista de Puntos vacia
+    List<XYZ> listaPuntos = new List<XYZ>();
+
+    // Libro de Excel y Hojas
+    var libro = new XLWorkbook(rutaArchivo);
+    var hoja = libro.Worksheet(1);
+
+    // Recorremos las Filas de la Hoja
+    foreach (var row in hoja.Rows())
+    {
+        try
+        {
+            double x = Convert.ToDouble(row.Cell(1).Value.ToString());
+            double y = Convert.ToDouble(row.Cell(2).Value.ToString());
+            XYZ punto = new XYZ(x, y, 0);
+            listaPuntos.Add(punto);
+        }
+        catch (Exception)
+        {
+            // No hacer nada
+        }
+    }
+
+    return listaPuntos;
+}
